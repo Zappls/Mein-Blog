@@ -1,0 +1,34 @@
+    User {
+        int id PK
+        varchar username
+        varchar email
+        varchar password
+        varchar avatar
+        datetime created_at
+        datetime last_login
+    }
+
+    Comments {
+        int id PK
+        datetime created_at
+        int likes
+        int dislikes
+        text content
+        int user_id FK
+        int post_id FK
+    }
+
+    Post {
+        int id PK
+        varchar title
+        text content
+        int likes
+        int dislikes
+        datetime created_at
+        datetime last_updated_at
+        int user_id FK
+    }
+
+    User ||--o{ Post : creates
+    User ||--o{ Comments : writes
+    Post ||--o{ Comments : has

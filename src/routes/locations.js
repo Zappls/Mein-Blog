@@ -35,7 +35,7 @@ export const updateLocation = async (req, res) => {
 }
   try {
     const result = await client.query(
-      "UPDATE locations SET location_name=$2, longitude=$3, latitude=$4, description=$5 WHERE id=$1", 
+      "UPDATE locations SET location_name=$2, longitude=$3, latitude=$4, description=$5 WHERE id=$1 RETURNING *", 
       [id, name, longitude, latitude, description]
     );
     res.status(201).json(result.rows[0]);

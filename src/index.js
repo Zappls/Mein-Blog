@@ -19,9 +19,9 @@ app.get("/locations", getAllLocations);
 
 app.post("/locations", addLocation);
 
-app.put("/locations", updateLocation);
+app.put("/locations/:id", updateLocation);
 
-app.delete("/locations", deleteLocation);
+app.delete("/locations/:id", deleteLocation);
 
 app.listen(port, () => {
   console.log(`Listening to http://localhost:${port}`);

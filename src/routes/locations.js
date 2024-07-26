@@ -28,27 +28,35 @@ export const addLocation = async (req, res) => {
 };
 
 export const updateLocation = async (req, res) => {
-  const { id, name, longitude, latitude, description } = req.body;
+  const id = req.params.id;
+  const { name, longitude, latitude, description } = req.body;
 
-  if (!id || (!name && !longitude && !latitude && !description)) {
+  if (!name && !longitude && !latitude && !description) {
     return res.status(400).send("Bad Request: Missing required fields");
+  }
+  if (!id) {
+    return res.status(400).send("Bad Request: Missing id");
   }
   try {
     const result = await client.query(
-      "UPDATE locations SET location_name=$2, longitude=$3, latitude=$4, description=$5 WHERE id=$1 RETURNING *",
-      [id, name, longitude, latitude, description]
+      "UPDATE locations SET location_name=$1, longitude=$2, latitude=$3, description=$4 WHERE id=$5 RETURNING *",
+      [name, longitude, latitude, description, id]
     );
-    res.status(201).json(result.rows[0]);
+    if (result.rows.length === 0) {
+      res.status(404).send({ message: "Location not found" });
+    } else {
+      res.status(200).send(result.rows[0]);
+    }
   } catch (err) {
     return res.send("Error");
   }
 };
 
 export const deleteLocation = async (req, res) => {
-  const { id } = req.body;
+  const id = req.params.id;
 
   if (!id) {
-    return res.status(400).send("Bad Request: Missing required field");
+    return res.status(400).send("Bad Request: Missing id");
   }
   try {
     const result = await client.query(

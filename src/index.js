@@ -1,5 +1,6 @@
 import express from "express";
 import { getAllLocations, addLocation } from "./routes/locations.js";
+import { health } from "./routes/health.js";
 
 const app = express();
 
@@ -7,9 +8,7 @@ app.use(express.json());
 
 const port = 3000;
 
-app.get("/", (req, res) => {
-  res.send("Welcome to my Website");
-});
+app.get("/health", health);
 
 app.get("/locations", getAllLocations);
 

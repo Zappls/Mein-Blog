@@ -3,6 +3,7 @@ import {
   getAllLocations,
   addLocation,
   updateLocation,
+  deleteLocation,
 } from "./routes/locations.js";
 import { health } from "./routes/health.js";
 
@@ -19,6 +20,8 @@ app.get("/locations", getAllLocations);
 app.post("/locations", addLocation);
 
 app.put("/locations", updateLocation);
+
+app.delete("/locations", deleteLocation);
 
 app.listen(port, () => {
   console.log(`Listening to http://localhost:${port}`);

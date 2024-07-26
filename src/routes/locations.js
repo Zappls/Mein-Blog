@@ -10,7 +10,7 @@ export const getAllLocations = async (req, res) => {
 };
 
 export const addLocation = async (req, res) => {
-  const { name, longitude, latitude, description) } = req.body;
+  const { name, longitude, latitude, description } = req.body;
 
   if (!name || !longitude || !latitude || !description) {
     return res.status(400).send("Bad Request: Missing required fields");
@@ -32,13 +32,35 @@ export const updateLocation = async (req, res) => {
 
   if (!id || (!name && !longitude && !latitude && !description)) {
     return res.status(400).send("Bad Request: Missing required fields");
-}
+  }
   try {
     const result = await client.query(
-      "UPDATE locations SET location_name=$2, longitude=$3, latitude=$4, description=$5 WHERE id=$1 RETURNING *", 
+      "UPDATE locations SET location_name=$2, longitude=$3, latitude=$4, description=$5 WHERE id=$1 RETURNING *",
       [id, name, longitude, latitude, description]
     );
     res.status(201).json(result.rows[0]);
+  } catch (err) {
+    return res.send("Error");
+  }
+};
+
+export const deleteLocation = async (req, res) => {
+  const { id } = req.body;
+
+  if (!id) {
+    return res.status(400).send("Bad Request: Missing required field");
+  }
+  try {
+    const result = await client.query(
+      "DELETE FROM locations WHERE id=$1 RETURNING *",
+      [id]
+    );
+    if (result.rows.length === 0) {
+      return res
+        .status(404)
+        .send("Not Found: No location with the provided id");
+    }
+    res.status(200).json(result.rows[0]);
   } catch (err) {
     return res.send("Error");
   }

@@ -1,4 +1,5 @@
 import express from "express";
+import dotenv from "dotenv";
 import {
   getAllLocations,
   addLocation,
@@ -6,6 +7,8 @@ import {
   deleteLocation,
 } from "./routes/locations.js";
 import { health } from "./routes/health.js";
+
+dotenv.config();
 
 const app = express();
 

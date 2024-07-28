@@ -1,10 +1,14 @@
-import { client } from "../utils/database.js";
+import supabase from "../utils/database.js";
 
 export const getAllLocations = async (req, res) => {
   try {
-    const result = await client.query("SELECT * FROM locations");
-    return res.json(result.rows);
+    const { data, error } = await supabase.from("locations").select();
+    if (error) {
+      throw error;
+    }
+    return res.json(data);
   } catch (err) {
+    console.error(err);
     return res.status(500).json({ error: "An unexpected error occurred" });
   }
 };
@@ -17,13 +21,17 @@ export const addLocation = async (req, res) => {
   }
 
   try {
-    const result = await client.query(
-      "INSERT INTO locations (location_name, longitude, latitude, description) VALUES ($1, $2, $3, $4) RETURNING *",
-      [name, longitude, latitude, description]
-    );
-    res.status(201).json(result.rows[0]);
+    const { data, error } = await supabase
+      .from("locations")
+      .insert([{ location_name: name, longitude, latitude, description }])
+      .single();
+    if (error) {
+      throw error;
+    }
+    return res.status(201).json(data);
   } catch (err) {
-    return res.send("Error");
+    console.error(err);
+    return res.status(500).json({ error: "An unexpected error occurred" });
   }
 };
 

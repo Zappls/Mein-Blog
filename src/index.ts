@@ -4,9 +4,10 @@ import {
   addLocation,
   updateLocation,
   deleteLocation,
-} from "./routes/locations.js";
-import { health } from "./routes/health.js";
-import { login, logout } from "./utils/authentication.js";
+} from "./routes/locations.ts";
+import { health } from "./routes/health.ts";
+import { login, logout } from "./utils/authentication.ts";
+
 const app = express();
 
 app.use(express.json());

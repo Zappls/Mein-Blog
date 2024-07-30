@@ -1,8 +1,20 @@
-import supabase from "../utils/database.js";
+import supabase from "../utils/database";
+import { Request, Response } from "express";
 
-export const getAllLocations = async (req, res) => {
+interface Location {
+  id: number;
+  name: string;
+  longitude: number;
+  latitude: number;
+  description: string;
+  // Add other fields that your `locations` table has
+}
+
+export const getAllLocations = async (req: Request, res: Response) => {
   try {
-    const { data, error } = await supabase.from("locations").select();
+    const { data, error } = await supabase
+      .from<Location>("locations")
+      .select("*");
     if (error) {
       throw error;
     }
@@ -13,7 +25,7 @@ export const getAllLocations = async (req, res) => {
   }
 };
 
-export const addLocation = async (req, res) => {
+export const addLocation = async (req: Request, res: Response) => {
   const { name, longitude, latitude, description } = req.body;
 
   if (!name || !longitude || !latitude || !description) {
@@ -22,7 +34,7 @@ export const addLocation = async (req, res) => {
 
   try {
     const { data, error } = await supabase
-      .from("locations")
+      .from<Location>("locations")
       .insert([{ location_name: name, longitude, latitude, description }])
       .single();
     if (error) {
@@ -35,7 +47,7 @@ export const addLocation = async (req, res) => {
   }
 };
 
-export const updateLocation = async (req, res) => {
+export const updateLocation = async (req: Request, res: Response) => {
   const id = req.params.id;
   const { name, longitude, latitude, description } = req.body;
 
@@ -46,37 +58,37 @@ export const updateLocation = async (req, res) => {
     return res.status(400).send("Bad Request: Missing id");
   }
   try {
-    const result = await client.query(
-      "UPDATE locations SET location_name=$1, longitude=$2, latitude=$3, description=$4 WHERE id=$5 RETURNING *",
-      [name, longitude, latitude, description, id]
-    );
-    if (result.rows.length === 0) {
+    const { data, error } = await supabase
+      .from<Location>("locations")
+      .update(req.body)
+      .eq("id", id);
+    if (data === null || data.length === 0) {
       res.status(404).send({ message: "Location not found" });
     } else {
-      res.status(200).send(result.rows[0]);
+      res.status(200).send(data.rows[0]);
     }
   } catch (err) {
     return res.send("Error");
   }
 };
 
-export const deleteLocation = async (req, res) => {
+export const deleteLocation = async (req: Request, res: Response) => {
   const id = req.params.id;
 
   if (!id) {
     return res.status(400).send("Bad Request: Missing id");
   }
   try {
-    const result = await client.query(
-      "DELETE FROM locations WHERE id=$1 RETURNING *",
-      [id]
-    );
-    if (result.rows.length === 0) {
+    const { data, error } = await supabase
+      .from<Location>("locations")
+      .delete()
+      .eq("id", id);
+    if (data.rows.length === 0) {
       return res
         .status(404)
         .send("Not Found: No location with the provided id");
     }
-    res.status(200).json(result.rows[0]);
+    res.status(200).json(data.rows[0]);
   } catch (err) {
     return res.send("Error");
   }

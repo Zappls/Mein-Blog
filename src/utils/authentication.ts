@@ -1,6 +1,7 @@
 import supabase from "./database.js";
+import { Request, Response } from "express";
 
-export const login = async (req, res) => {
+export const login = async (req: Request, res: Response) => {
   const { email, password } = req.body;
   if (!email || !password) {
     res
@@ -17,7 +18,7 @@ export const login = async (req, res) => {
   return res.status(200).json({ ok: true, data });
 };
 
-export const logout = async (req, res) => {
+export const logout = async (req: Request, res: Response) => {
   const { error } = await supabase.auth.signOut();
   if (error) {
     res.status(401).json({ ok: false, message: "Logout failed" });

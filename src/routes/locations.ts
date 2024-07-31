@@ -1,20 +1,9 @@
 import supabase from "../utils/database";
 import { Request, Response } from "express";
 
-interface Location {
-  id: number;
-  name: string;
-  longitude: number;
-  latitude: number;
-  description: string;
-  // Add other fields that your `locations` table has
-}
-
 export const getAllLocations = async (req: Request, res: Response) => {
   try {
-    const { data, error } = await supabase
-      .from<Location>("locations")
-      .select("*");
+    const { data, error } = await supabase.from("locations").select("*");
     if (error) {
       throw error;
     }
@@ -34,9 +23,9 @@ export const addLocation = async (req: Request, res: Response) => {
 
   try {
     const { data, error } = await supabase
-      .from<Location>("locations")
+      .from("locations")
       .insert([{ location_name: name, longitude, latitude, description }])
-      .single();
+      .select();
     if (error) {
       throw error;
     }
@@ -59,13 +48,14 @@ export const updateLocation = async (req: Request, res: Response) => {
   }
   try {
     const { data, error } = await supabase
-      .from<Location>("locations")
+      .from("locations")
       .update(req.body)
-      .eq("id", id);
+      .eq("id", id)
+      .select();
     if (data === null || data.length === 0) {
       res.status(404).send({ message: "Location not found" });
     } else {
-      res.status(200).send(data.rows[0]);
+      res.status(200).send(data[0]);
     }
   } catch (err) {
     return res.send("Error");
@@ -80,15 +70,16 @@ export const deleteLocation = async (req: Request, res: Response) => {
   }
   try {
     const { data, error } = await supabase
-      .from<Location>("locations")
+      .from("locations")
       .delete()
-      .eq("id", id);
-    if (data.rows.length === 0) {
+      .eq("id", id)
+      .select();
+    if (!data || data.length === 0) {
       return res
         .status(404)
         .send("Not Found: No location with the provided id");
     }
-    res.status(200).json(data.rows[0]);
+    res.status(200).json(data[0]);
   } catch (err) {
     return res.send("Error");
   }
